@@ -6,12 +6,12 @@ module Blogit
 
     # We can't use blogit_conf here because it sometimes raises NoMethodError in main app's routes
     unless Blogit.configuration.include_admin_actions
-      before_filter :raise_404, except: [:index, :show, :tagged]
+      before_filter :raise_404, except: [:index, :show]
     end
 
-    blogit_authenticate(except: [:index, :show, :tagged])
+    blogit_authenticate(except: [:index, :show])
 
-    blogit_cacher(:index, :show, :tagged)
+    blogit_cacher(:index, :show)
     blogit_sweeper(:create, :update, :destroy)
 
     def index
@@ -30,11 +30,6 @@ module Blogit
 
     def show
       @post = Post.find(params[:id])
-    end
-
-    def tagged
-      @posts = Post.for_index(params[:page]).tagged_with(params[:tag])
-      render :index
     end
 
     def new
@@ -72,7 +67,7 @@ module Blogit
     protected
 
     def valid_params
-      params.require(:post).permit(:title, :body, :tag_list, :blogger_type, :blogger_id)
+      params.require(:post).permit(:title, :body, :blogger_type, :blogger_id)
     end
 
     private
